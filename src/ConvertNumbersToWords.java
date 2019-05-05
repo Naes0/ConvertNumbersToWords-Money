@@ -12,18 +12,26 @@ public class ConvertNumbersToWords
         initMaps();
         String words = "";
         int dollars = -1;
-        int cents = -1;
+        String cents = "";
         //calculate number of dots
         int numDots = NumberString.length() - NumberString.replace(".", "").length();
         if(numDots == 1)
         {
             String[] dollarsCents = NumberString.split("\\.");
-            try
+            //check just in case a single '.' is entered.
+            if (dollarsCents.length != 0)
             {
-                dollars = Integer.parseInt(dollarsCents[0]);
-                cents = Integer.parseInt(dollarsCents[1]);
+                try
+                {
+                    dollars = Integer.parseInt(dollarsCents[0]);
+                    cents = dollarsCents[1];
+                }
+                catch(NumberFormatException e)
+                {
+                    throw new InvalidInputException("Error: Invalid input format, input is not an integer!");
+                }
             }
-            catch(NumberFormatException e)
+            else
             {
                 throw new InvalidInputException("Error: Invalid input format, input is not an integer!");
             }
@@ -37,7 +45,7 @@ public class ConvertNumbersToWords
             try
             {
                 dollars = Integer.parseInt(NumberString);
-                cents = 0;
+                cents = "0";
             }
             catch(NumberFormatException e)
             {
@@ -45,8 +53,8 @@ public class ConvertNumbersToWords
             }
         }
 
-        String centWords = centsToWords(cents);
         String dollarWords = dollarsToWords(dollars);
+        String centWords = centsToWords(cents);
         words = dollarWords + " DOLLARS AND " + centWords + " CENTS";
         return words;
     }
@@ -91,10 +99,10 @@ public class ConvertNumbersToWords
         return dollarWords;
     }
     
-    private static String tensToWords(int cents) throws InvalidInputException
+    private static String tensToWords(int twoDigit) throws InvalidInputException
     {
-        String centsWords = "";
-        int length = Integer.toString(cents).length();
+        String twoDigitWords = "";
+        int length = Integer.toString(twoDigit).length();
 
         int firstInt = -1;
         int secondInt = -1;
@@ -103,49 +111,49 @@ public class ConvertNumbersToWords
 
         if(length == 2)
         {
-            firstInt = cents / 10;
-            secondInt = cents % 10;
+            firstInt = twoDigit / 10;
+            secondInt = twoDigit % 10;
             //double digits but 10 - 19
             if (firstInt == 1)
             {
-                centsWords = doubles.get(cents);
+                twoDigitWords = doubles.get(twoDigit);
             }
             //double digits 20 - 99
             else
             {
                 if (secondInt == 0)
                 {
-                    centsWords = tens.get(cents);
+                    twoDigitWords = tens.get(twoDigit);
                 } else
                 {
                     first = tens.get(firstInt * 10);
                     second = singles.get(secondInt);
-                    centsWords = first + "-" + second;
+                    twoDigitWords = first + "-" + second;
                 }
             }
         }
         else if (length == 1)
         {
-            if(cents != 0)
+            if(twoDigit != 0)
             {
-                centsWords = singles.get(cents);
+                twoDigitWords = singles.get(twoDigit);
             }
             else
             {
-                centsWords = "ZERO";
+                twoDigitWords = "ZERO";
             }
         }
         else
         {
             throw new InvalidInputException("Error: Invalid cents length!");
         }
-        return centsWords;
+        return twoDigitWords;
     }
 
-    private static String centsToWords(int cents) throws InvalidInputException
+    private static String centsToWords(String cents) throws InvalidInputException
     {
         String centsWords = "";
-        int length = Integer.toString(cents).length();
+        int length = cents.length();
 
         int firstInt = -1;
         int secondInt = -1;
@@ -154,19 +162,24 @@ public class ConvertNumbersToWords
 
         if(length == 2)
         {
-            firstInt = cents / 10;
-            secondInt = cents % 10;
-            //double digits but 10 - 19
-            if (firstInt == 1)
+            firstInt = Character.getNumericValue(cents.charAt(0));
+            secondInt = Character.getNumericValue(cents.charAt(1));
+            // single digits 0 - 9
+            if( firstInt == 0 )
             {
-                centsWords = doubles.get(cents);
+                centsWords = singles.get(secondInt);
+            }
+            //double digits but 10 - 19
+            else if (firstInt == 1)
+            {
+                centsWords = doubles.get(firstInt*10 + secondInt);
             }
             //double digits 20 - 99
             else
             {
                 if (secondInt == 0)
                 {
-                    centsWords = tens.get(cents);
+                    centsWords = tens.get(firstInt*10);
                 }
                 else
                 {
@@ -178,9 +191,10 @@ public class ConvertNumbersToWords
         }
         else if (length == 1)
         {
-            if(cents != 0)
+            firstInt = Character.getNumericValue(cents.charAt(0));
+            if(firstInt != 0)
             {
-                centsWords = tens.get(cents*10);
+                centsWords = tens.get(firstInt*10);
             }
             else
             {
@@ -197,6 +211,7 @@ public class ConvertNumbersToWords
     private static void initMaps()
     {
         //Initialise Singles Map
+        singles.put(0, "ZERO");
         singles.put(1, "ONE");
         singles.put(2, "TWO");
         singles.put(3, "THREE");

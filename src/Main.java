@@ -10,7 +10,7 @@ public class Main
             try
             {
                 Scanner scan = new Scanner(System.in);
-                System.out.println("Please enter a number between 0.00 and 2,147,483,647.99 to convert or 'q' to exit:");
+                System.out.println("Please enter a number between 0.00 and 2,147,483,647.99 to convert or 'q' to quit:");
                 String numberString = scan.nextLine();
                 if(numberString.equals("q"))
                 {
@@ -26,7 +26,6 @@ public class Main
             catch (InvalidInputException e)
             {
                 System.out.println(e.getMessage());
-                System.out.println("Please enter a number between 0.00 - 2,147,483,647.99");
             }
         }
     }
