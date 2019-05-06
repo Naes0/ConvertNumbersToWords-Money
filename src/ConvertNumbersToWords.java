@@ -162,8 +162,16 @@ public class ConvertNumbersToWords
 
         if(length == 2)
         {
+            int asciiFirst = (int)cents.charAt(0);
+            int asciiSecond = (int)cents.charAt(1);
+            if(asciiFirst < 48 || asciiFirst > 57 || asciiSecond < 48 || asciiSecond > 57)
+            {
+                throw new InvalidInputException("Error: Not a valid number.");
+            }
+
             firstInt = Character.getNumericValue(cents.charAt(0));
             secondInt = Character.getNumericValue(cents.charAt(1));
+
             // single digits 0 - 9
             if( firstInt == 0 )
             {
@@ -177,15 +185,22 @@ public class ConvertNumbersToWords
             //double digits 20 - 99
             else
             {
-                if (secondInt == 0)
+                if (secondInt == 0 )
                 {
                     centsWords = tens.get(firstInt*10);
                 }
                 else
                 {
-                    first = tens.get(firstInt * 10);
-                    second = singles.get(secondInt);
-                    centsWords = first + "-" + second;
+                    if (tens.containsKey(firstInt*10) && singles.containsKey(secondInt))
+                    {
+                        first = tens.get(firstInt * 10);
+                        second = singles.get(secondInt);
+                        centsWords = first + "-" + second;
+                    }
+                    else
+                    {
+                        throw new InvalidInputException("Error: Not a valid number.");
+                    }
                 }
             }
         }
@@ -194,7 +209,14 @@ public class ConvertNumbersToWords
             firstInt = Character.getNumericValue(cents.charAt(0));
             if(firstInt != 0)
             {
-                centsWords = tens.get(firstInt*10);
+                if(tens.containsKey(firstInt*10))
+                {
+                    centsWords = tens.get(firstInt*10);
+                }
+                else
+                {
+                    throw new InvalidInputException("Error: Not a valid number.");
+                }
             }
             else
             {
